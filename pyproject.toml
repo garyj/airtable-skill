@@ -1,0 +1,21 @@
+[project]
+name = "airtable-skill"
+version = "0.1.0"
+description = "Airtable integration skill for Claude Code"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pyairtable>=3.3.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-dotenv>=0.5.2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".claude/skills/airtable/scripts"]
+env_files = [".env"]
+markers = ["integration: tests requiring real Airtable API access"]
