@@ -16,6 +16,6 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = [".claude/skills/airtable/scripts"]
+pythonpath = ["skills/airtable/scripts"]
 env_files = [".env"]
 markers = ["integration: tests requiring real Airtable API access"]

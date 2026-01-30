@@ -1,6 +1,6 @@
 ---
 name: airtable
-description: Access Airtable bases, tables, and records using Python scripts. Use when user mentions Airtable, bases, tables, records, spreadsheets, or needs to query/manage structured data. Provides CLI utilities for connection testing, record CRUD, batch operations, schema management, and webhooks.
+description: "Use when the user mentions Airtable, bases, tables, records, spreadsheets, or needs to query/manage structured data. Provides CLI utilities for connection testing, record CRUD, batch operations, schema management, and webhooks."
 ---
 
 # Airtable Skill
@@ -43,7 +43,7 @@ If the token is not configured, guide the user:
 
 ## Scripts Reference
 
-All scripts use `uv run .claude/skills/airtable/scripts/<script>.py` pattern.
+All scripts use `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/<script>.py` pattern.
 
 ### connection.py - Connection & Discovery
 
@@ -51,13 +51,13 @@ Test connectivity and discover accessible bases.
 
 ```bash
 # Test API connection
-uv run .claude/skills/airtable/scripts/connection.py test
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/connection.py test
 
 # List all accessible bases
-uv run .claude/skills/airtable/scripts/connection.py bases
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/connection.py bases
 
 # List bases with JSON output
-uv run .claude/skills/airtable/scripts/connection.py bases --json
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/connection.py bases --json
 ```
 
 ### schema.py - Schema Management
@@ -66,29 +66,29 @@ Inspect and modify table structures.
 
 ```bash
 # List all tables in a base
-uv run .claude/skills/airtable/scripts/schema.py tables list --base-id appXXX
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables list --base-id appXXX
 
 # Describe table fields
-uv run .claude/skills/airtable/scripts/schema.py tables describe --base-id appXXX --table "Contacts"
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables describe --base-id appXXX --table "Contacts"
 
 # Create a new table
-uv run .claude/skills/airtable/scripts/schema.py tables create --base-id appXXX --name "Tasks" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables create --base-id appXXX --name "Tasks" \
     --fields '[{"name": "Task Name", "type": "singleLineText"}, {"name": "Due Date", "type": "date"}]'
 
 # Delete a table
-uv run .claude/skills/airtable/scripts/schema.py tables delete --base-id appXXX --table "Old Table"
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables delete --base-id appXXX --table "Old Table"
 
 # Add a field to existing table
-uv run .claude/skills/airtable/scripts/schema.py fields create --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py fields create --base-id appXXX --table "Contacts" \
     --field '{"name": "Notes", "type": "multilineText"}'
 
 # Update field name or description
-uv run .claude/skills/airtable/scripts/schema.py fields update --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py fields update --base-id appXXX --table "Contacts" \
     --field-id fldXXX --name "Contact Notes"
 
 # JSON output for any command
-uv run .claude/skills/airtable/scripts/schema.py tables list --base-id appXXX --json
-uv run .claude/skills/airtable/scripts/schema.py tables describe --base-id appXXX --table "Contacts" --json
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables list --base-id appXXX --json
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables describe --base-id appXXX --table "Contacts" --json
 ```
 
 **Supported field types:** singleLineText, multilineText, number, email, url, phoneNumber, singleSelect, multipleSelects, checkbox, date, dateTime, currency, percent, duration, rating, richText, multipleRecordLinks, multipleAttachments, multipleLookupValues, rollup
@@ -99,56 +99,56 @@ Create, read, update, delete, and query records.
 
 ```bash
 # List records (default limit applies)
-uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts"
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts"
 
 # List with field selection and limit
-uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" \
     --fields "Name,Email,Company" --max-records 10
 
 # List with sorting
-uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --sort "Name"
-uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --sort "Name:desc"
-uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --sort "Status,Name:desc"
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --sort "Name"
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --sort "Name:desc"
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --sort "Status,Name:desc"
 
 # Get a specific record
-uv run .claude/skills/airtable/scripts/records.py get --base-id appXXX --table "Contacts" --record-id recXXX
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py get --base-id appXXX --table "Contacts" --record-id recXXX
 
 # Query with Airtable formula
-uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
     --formula "{Status}='Active'"
 
 # Query with match criteria (equality matching)
-uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
     --match '{"Status": "Active", "Company": "Acme Corp"}'
 
 # Create a record
-uv run .claude/skills/airtable/scripts/records.py create --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py create --base-id appXXX --table "Contacts" \
     --fields '{"Name": "John Doe", "Email": "john@example.com"}'
 
 # Update a record
-uv run .claude/skills/airtable/scripts/records.py update --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py update --base-id appXXX --table "Contacts" \
     --record-id recXXX --fields '{"Status": "Inactive"}'
 
 # Delete a record
-uv run .claude/skills/airtable/scripts/records.py delete --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py delete --base-id appXXX --table "Contacts" \
     --record-id recXXX
 
 # List comments on a record
-uv run .claude/skills/airtable/scripts/records.py comments --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py comments --base-id appXXX --table "Contacts" \
     --record-id recXXX
 
 # Add a comment to a record
-uv run .claude/skills/airtable/scripts/records.py add-comment --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py add-comment --base-id appXXX --table "Contacts" \
     --record-id recXXX --text "Followed up via email"
 
 # Delete a comment from a record
-uv run .claude/skills/airtable/scripts/records.py delete-comment --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py delete-comment --base-id appXXX --table "Contacts" \
     --record-id recXXX --comment-id comXXX
 
 # JSON output
-uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --json
-uv run .claude/skills/airtable/scripts/records.py get --base-id appXXX --table "Contacts" --record-id recXXX --json
-uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" --formula "{Status}='Active'" --json
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --json
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py get --base-id appXXX --table "Contacts" --record-id recXXX --json
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" --formula "{Status}='Active'" --json
 ```
 
 **Formula examples:**
@@ -178,25 +178,25 @@ Efficient batch create, update, upsert, and delete.
 
 ```bash
 # Batch create records
-uv run .claude/skills/airtable/scripts/batch.py create --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/batch.py create --base-id appXXX --table "Contacts" \
     --records '[{"Name": "Alice"}, {"Name": "Bob"}, {"Name": "Charlie"}]'
 
 # Batch update records
-uv run .claude/skills/airtable/scripts/batch.py update --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/batch.py update --base-id appXXX --table "Contacts" \
     --records '[{"id": "recXXX", "fields": {"Status": "Active"}}, {"id": "recYYY", "fields": {"Status": "Inactive"}}]'
 
 # Upsert records (create or update based on key fields)
-uv run .claude/skills/airtable/scripts/batch.py upsert --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/batch.py upsert --base-id appXXX --table "Contacts" \
     --records '[{"Email": "alice@example.com", "Name": "Alice Updated"}]' \
     --key-fields "Email"
 
 # Batch delete records
-uv run .claude/skills/airtable/scripts/batch.py delete --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/batch.py delete --base-id appXXX --table "Contacts" \
     --record-ids "recXXX,recYYY,recZZZ"
 
 # JSON output
-uv run .claude/skills/airtable/scripts/batch.py create --base-id appXXX --table "Contacts" --records '[...]' --json
-uv run .claude/skills/airtable/scripts/batch.py upsert --base-id appXXX --table "Contacts" --records '[...]' --key-fields "Email" --json
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/batch.py create --base-id appXXX --table "Contacts" --records '[...]' --json
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/batch.py upsert --base-id appXXX --table "Contacts" --records '[...]' --key-fields "Email" --json
 ```
 
 ### webhooks.py - Webhook Management
@@ -205,33 +205,33 @@ Create and manage webhooks for change notifications.
 
 ```bash
 # List all webhooks
-uv run .claude/skills/airtable/scripts/webhooks.py list --base-id appXXX
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/webhooks.py list --base-id appXXX
 
 # Get webhook details
-uv run .claude/skills/airtable/scripts/webhooks.py get --base-id appXXX --webhook-id whXXX
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/webhooks.py get --base-id appXXX --webhook-id whXXX
 
 # Create a webhook (watch all table data)
-uv run .claude/skills/airtable/scripts/webhooks.py create --base-id appXXX \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/webhooks.py create --base-id appXXX \
     --url "https://example.com/webhook" \
     --spec '{"options": {"filters": {"dataTypes": ["tableData"]}}}'
 
 # Create webhook for specific table
-uv run .claude/skills/airtable/scripts/webhooks.py create --base-id appXXX \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/webhooks.py create --base-id appXXX \
     --url "https://example.com/webhook" \
     --spec '{"options": {"filters": {"dataTypes": ["tableData"], "recordChangeScope": "tblXXX"}}}'
 
 # Get webhook payloads
-uv run .claude/skills/airtable/scripts/webhooks.py payloads --base-id appXXX --webhook-id whXXX
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/webhooks.py payloads --base-id appXXX --webhook-id whXXX
 
 # Get payloads with cursor (pagination)
-uv run .claude/skills/airtable/scripts/webhooks.py payloads --base-id appXXX --webhook-id whXXX --cursor 123
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/webhooks.py payloads --base-id appXXX --webhook-id whXXX --cursor 123
 
 # Delete a webhook
-uv run .claude/skills/airtable/scripts/webhooks.py delete --base-id appXXX --webhook-id whXXX
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/webhooks.py delete --base-id appXXX --webhook-id whXXX
 
 # JSON output
-uv run .claude/skills/airtable/scripts/webhooks.py list --base-id appXXX --json
-uv run .claude/skills/airtable/scripts/webhooks.py payloads --base-id appXXX --webhook-id whXXX --json
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/webhooks.py list --base-id appXXX --json
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/webhooks.py payloads --base-id appXXX --webhook-id whXXX --json
 ```
 
 ## Common Workflows
@@ -240,26 +240,26 @@ uv run .claude/skills/airtable/scripts/webhooks.py payloads --base-id appXXX --w
 
 ```bash
 # 1. Test connection
-uv run .claude/skills/airtable/scripts/connection.py test
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/connection.py test
 
 # 2. List available bases
-uv run .claude/skills/airtable/scripts/connection.py bases
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/connection.py bases
 
 # 3. List tables in the base
-uv run .claude/skills/airtable/scripts/schema.py tables list --base-id appXXX
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables list --base-id appXXX
 
 # 4. Describe table structure
-uv run .claude/skills/airtable/scripts/schema.py tables describe --base-id appXXX --table "Tasks"
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables describe --base-id appXXX --table "Tasks"
 
 # 5. Preview records
-uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "Tasks" --max-records 5
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Tasks" --max-records 5
 ```
 
 ### Workflow 2: Create Table and Add Records
 
 ```bash
 # 1. Create a new table with initial fields
-uv run .claude/skills/airtable/scripts/schema.py tables create --base-id appXXX --name "Invoices" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables create --base-id appXXX --name "Invoices" \
     --fields '[
         {"name": "Invoice ID", "type": "singleLineText"},
         {"name": "Amount", "type": "currency", "options": {"precision": 2, "symbol": "$"}},
@@ -268,25 +268,25 @@ uv run .claude/skills/airtable/scripts/schema.py tables create --base-id appXXX 
     ]'
 
 # 2. Add records in batch
-uv run .claude/skills/airtable/scripts/batch.py create --base-id appXXX --table "Invoices" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/batch.py create --base-id appXXX --table "Invoices" \
     --records '[
         {"Invoice ID": "INV-001", "Amount": 1500, "Date": "2024-01-15", "Status": "Paid"},
         {"Invoice ID": "INV-002", "Amount": 1500, "Date": "2024-02-15", "Status": "Pending"}
     ]'
 
 # 3. Query to verify
-uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "Invoices"
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Invoices"
 ```
 
 ### Workflow 3: Query and Update Records
 
 ```bash
 # 1. Query with a formula
-uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Tasks" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Tasks" \
     --formula "IS_BEFORE({Due Date}, TODAY())"
 
 # 2. Update matching records (one at a time or batch)
-uv run .claude/skills/airtable/scripts/records.py update --base-id appXXX --table "Tasks" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py update --base-id appXXX --table "Tasks" \
     --record-id recXXX --fields '{"Status": "Overdue"}'
 ```
 
@@ -296,11 +296,11 @@ uv run .claude/skills/airtable/scripts/records.py update --base-id appXXX --tabl
 
 ```bash
 # Find contacts needing follow-up
-uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
     --formula "IS_BEFORE({Last Contacted}, DATEADD(TODAY(), -30, 'days'))"
 
 # Find high-value leads
-uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
     --formula "AND({Status}='Lead', {Deal Value}>5000)"
 ```
 
@@ -308,11 +308,11 @@ uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table
 
 ```bash
 # Find overdue tasks
-uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Tasks" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Tasks" \
     --formula "AND(IS_BEFORE({Due Date}, TODAY()), {Status}!='Done')"
 
 # Find tasks assigned to a team member across linked projects
-uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Tasks" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Tasks" \
     --formula "AND({Assignee}='Alice', {Project Status (from Project)}='Active')"
 ```
 
@@ -320,11 +320,11 @@ uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table
 
 ```bash
 # Find items below reorder threshold
-uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Inventory" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Inventory" \
     --formula "{Quantity}<{Reorder Level}"
 
 # Find items expiring in next 30 days
-uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Inventory" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Inventory" \
     --formula "AND({Expiry Date}, IS_BEFORE({Expiry Date}, DATEADD(TODAY(), 30, 'days')))"
 ```
 
@@ -351,15 +351,15 @@ JSON output is useful for:
 Example with jq:
 ```bash
 # Count active records
-uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
     --formula "{Status}='Active'" --json | jq 'length'
 
 # Extract specific field from records
-uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --json \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --json \
     | jq '.[].fields.Email'
 
 # Get record IDs only
-uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --json \
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --json \
     | jq '.[].id'
 ```
 
@@ -379,12 +379,12 @@ Scripts provide clear error messages without exposing sensitive data:
 
 | Task | Command |
 |------|---------|
-| Test connection | `uv run .claude/skills/airtable/scripts/connection.py test` |
-| List bases | `uv run .claude/skills/airtable/scripts/connection.py bases` |
-| List tables | `uv run .claude/skills/airtable/scripts/schema.py tables list --base-id appXXX` |
-| Describe table | `uv run .claude/skills/airtable/scripts/schema.py tables describe --base-id appXXX --table "Name"` |
-| List records | `uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "Name"` |
-| Query records | `uv run .claude/skills/airtable/scripts/records.py query --base-id appXXX --table "Name" --formula "..."` |
-| Create record | `uv run .claude/skills/airtable/scripts/records.py create --base-id appXXX --table "Name" --fields '{...}'` |
-| Batch create | `uv run .claude/skills/airtable/scripts/batch.py create --base-id appXXX --table "Name" --records '[...]'` |
-| List webhooks | `uv run .claude/skills/airtable/scripts/webhooks.py list --base-id appXXX` |
+| Test connection | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/connection.py test` |
+| List bases | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/connection.py bases` |
+| List tables | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables list --base-id appXXX` |
+| Describe table | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables describe --base-id appXXX --table "Name"` |
+| List records | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Name"` |
+| Query records | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Name" --formula "..."` |
+| Create record | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py create --base-id appXXX --table "Name" --fields '{...}'` |
+| Batch create | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/batch.py create --base-id appXXX --table "Name" --records '[...]'` |
+| List webhooks | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/webhooks.py list --base-id appXXX` |

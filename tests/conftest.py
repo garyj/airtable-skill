@@ -20,7 +20,7 @@ def project_root() -> Path:
 @pytest.fixture(scope="session")
 def scripts_dir(project_root) -> Path:
     """Path to the airtable scripts directory."""
-    return project_root / ".claude" / "skills" / "airtable" / "scripts"
+    return project_root / "skills" / "airtable" / "scripts"
 
 
 # === CLI Script Runner Fixture ===
