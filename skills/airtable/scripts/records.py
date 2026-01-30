@@ -534,6 +534,9 @@ def main() -> int:
     delete_parser.add_argument(
         "--record-id", required=True, help="The record ID to delete"
     )
+    delete_parser.add_argument(
+        "--json", action="store_true", help="Output as JSON with deleted record ID"
+    )
 
     # query subcommand
     query_parser = subparsers.add_parser(
@@ -588,6 +591,9 @@ def main() -> int:
     add_comment_parser.add_argument(
         "--text", required=True, help="The comment text"
     )
+    add_comment_parser.add_argument(
+        "--json", action="store_true", help="Output as JSON with comment ID and text"
+    )
 
     # delete-comment subcommand
     delete_comment_parser = subparsers.add_parser(
@@ -604,6 +610,9 @@ def main() -> int:
     )
     delete_comment_parser.add_argument(
         "--comment-id", required=True, help="The comment ID to delete"
+    )
+    delete_comment_parser.add_argument(
+        "--json", action="store_true", help="Output as JSON with deleted comment ID"
     )
 
     args = parser.parse_args()
@@ -711,7 +720,10 @@ def main() -> int:
     elif args.command == "delete":
         try:
             result = delete_record(api, args.base_id, args.table, args.record_id)
-            print(f"Deleted record: {result['id']}")
+            if args.json:
+                print(json.dumps(result, indent=2))
+            else:
+                print(f"Deleted record: {result['id']}")
             return 0
         except Exception as e:
             print(f"Error deleting record: {e}", file=sys.stderr)
@@ -779,7 +791,10 @@ def main() -> int:
             result = add_comment(
                 api, args.base_id, args.table, args.record_id, args.text
             )
-            print(f"Created comment: {result['id']}")
+            if args.json:
+                print(json.dumps(result, indent=2))
+            else:
+                print(f"Created comment: {result['id']}")
             return 0
         except Exception as e:
             print(f"Error adding comment: {e}", file=sys.stderr)
@@ -790,7 +805,10 @@ def main() -> int:
             result = delete_comment(
                 api, args.base_id, args.table, args.record_id, args.comment_id
             )
-            print(f"Deleted comment: {result['id']}")
+            if args.json:
+                print(json.dumps(result, indent=2))
+            else:
+                print(f"Deleted comment: {result['id']}")
             return 0
         except ValueError as e:
             print(f"Error: {e}", file=sys.stderr)

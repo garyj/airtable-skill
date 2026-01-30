@@ -330,6 +330,9 @@ def main() -> int:
     delete_parser = subparsers.add_parser("delete", help="Delete a webhook")
     delete_parser.add_argument("--base-id", required=True, help="The Airtable base ID")
     delete_parser.add_argument("--webhook-id", required=True, help="The webhook ID")
+    delete_parser.add_argument(
+        "--json", action="store_true", help="Output as JSON with deleted webhook ID"
+    )
 
     # payloads subcommand
     payloads_parser = subparsers.add_parser(
@@ -472,7 +475,10 @@ def main() -> int:
     elif args.command == "delete":
         try:
             delete_webhook(api, args.base_id, args.webhook_id)
-            print(f"Deleted webhook: {args.webhook_id}")
+            if args.json:
+                print(json.dumps({"id": args.webhook_id, "deleted": True}, indent=2))
+            else:
+                print(f"Deleted webhook: {args.webhook_id}")
             return 0
         except KeyError:
             print(f"Error: Webhook '{args.webhook_id}' not found", file=sys.stderr)

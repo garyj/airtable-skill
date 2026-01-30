@@ -668,6 +668,9 @@ def main() -> int:
     tables_delete_parser.add_argument(
         "--table", required=True, help="The table name or ID to delete"
     )
+    tables_delete_parser.add_argument(
+        "--json", action="store_true", help="Output as JSON with deleted table name"
+    )
 
     # fields subcommand group
     fields_parser = subparsers.add_parser("fields", help="Field operations")
@@ -783,7 +786,10 @@ def main() -> int:
         elif args.tables_command == "delete":
             try:
                 result = delete_table(api, args.base_id, args.table)
-                print(f"Deleted table '{result['name']}'")
+                if args.json:
+                    print(json.dumps(result, indent=2))
+                else:
+                    print(f"Deleted table '{result['name']}'")
                 return 0
             except Exception as e:
                 print(f"Error deleting table: {e}", file=sys.stderr)
