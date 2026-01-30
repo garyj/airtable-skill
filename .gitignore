@@ -6,6 +6,7 @@ out/
 
 # Environment variables
 .env
+.envrc
 
 # Python-generated files
 __pycache__/
@@ -20,3 +21,6 @@ wheels/
 
 # Test cache
 .pytest_cache/
+
+# Linter cache
+.ruff_cache/

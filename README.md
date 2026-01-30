@@ -81,13 +81,7 @@ export AIRTABLE_API_TOKEN="patXXXXXXXX.XXXXXXX"
 
 ## Verify Installation
 
-After installing, check that the skill and command are available:
-
-```bash
-/help
-```
-
-You should see `/airtable` listed under commands. Then test the connection:
+After installing, test the connection:
 
 ```
 Test my Airtable connection
@@ -97,7 +91,7 @@ Claude will run `connection.py test` and confirm whether your token is valid and
 
 ## Usage
 
-The plugin activates automatically when you mention Airtable, bases, tables, records, or structured data. You can also invoke it explicitly with `/airtable`.
+The plugin activates automatically when you mention Airtable, bases, tables, records, or structured data.
 
 **Explore a base:**
 > List the tables in my Airtable base appXXXXX

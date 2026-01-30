@@ -30,8 +30,6 @@ uv run skills/airtable/scripts/records.py list --base-id appXXX --table "TableNa
 ```
 .claude-plugin/
 └── plugin.json               # Plugin manifest
-commands/
-└── airtable.md               # /airtable command wrapper
 skills/airtable/
 ├── SKILL.md                  # Skill definition and usage documentation
 ├── privacy.md                # PII handling and security guidelines
@@ -76,7 +74,8 @@ Before committing ANY changes to plugin code, skills, or scripts:
 
 - [ ] Version bumped in `.claude-plugin/plugin.json`
 - [ ] Version bumped in `.claude-plugin/marketplace.json` (must match)
-- [ ] Both versions are identical
+- [ ] Version bumped in `pyproject.toml` (must match)
+- [ ] All three versions are identical
 - [ ] Tests pass: `uv run pytest`
 
 ## Environment Variables
