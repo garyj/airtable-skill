@@ -1,0 +1,11 @@
+{
+  "name": "airtable",
+  "version": "0.1.0",
+  "description": "Airtable integration for Claude Code. CLI scripts for bases, tables, records, batch operations, schema management, and webhooks.",
+  "author": {
+    "name": "Gary Jarrel"
+  },
+  "repository": "https://github.com/garyj/airtable-skill",
+  "license": "MIT",
+  "skills": "./skills/"
+}

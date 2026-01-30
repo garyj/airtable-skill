@@ -1,0 +1,25 @@
+{
+  "name": "airtable-marketplace",
+  "owner": {
+    "name": "Gary Jarrel",
+    "url": "https://github.com/garyj"
+  },
+  "metadata": {
+    "description": "Plugin marketplace for the Airtable Claude Code plugin",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "airtable",
+      "description": "Airtable integration for Claude Code. CLI scripts for bases, tables, records, batch operations, schema management, and webhooks.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Gary Jarrel",
+        "url": "https://github.com/garyj"
+      },
+      "homepage": "https://github.com/garyj/airtable-skill",
+      "tags": ["airtable", "database", "migration", "records", "batch-operations", "schema-management", "webhooks"],
+      "source": "./"
+    }
+  ]
+}
