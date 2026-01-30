@@ -1595,6 +1595,42 @@ class TestTablesDeleteIntegration:
         table_names_after = [t["name"] for t in tables_after]
         assert table_name not in table_names_after, "Table should be gone after deletion"
 
+    @pytest.mark.xfail(reason="API token lacks schema.bases:write scope for table deletion")
+    def test_tables_delete_json_output(
+        self, run_script, api, test_base_id: str | None
+    ) -> None:
+        """Test deleting a table with --json flag outputs valid JSON."""
+        if not test_base_id:
+            pytest.skip("AIRTABLE_TEST_BASE_ID not set, skipping integration test")
+
+        table_name = f"TestDeleteJson_{uuid.uuid4().hex[:8]}"
+
+        # Create a table first
+        base = api.base(test_base_id)
+        new_table = base.create_table(
+            name=table_name,
+            fields=[{"name": "Name", "type": "singleLineText"}],
+        )
+
+        # Delete with --json
+        delete_result = run_script(
+            "schema.py",
+            [
+                "tables",
+                "delete",
+                "--base-id",
+                test_base_id,
+                "--table",
+                table_name,
+                "--json",
+            ],
+        )
+
+        assert delete_result.returncode == 0, f"Delete failed: {delete_result.stderr}"
+        data = json.loads(delete_result.stdout)
+        assert data["deleted"] is True
+        assert data["name"] == table_name
+
 
 class TestLookupFieldCommand:
     """Tests for creating lookup fields via the fields create command."""

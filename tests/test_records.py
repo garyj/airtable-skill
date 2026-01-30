@@ -1558,6 +1558,224 @@ class TestRecordsIntegration:
                     # Best effort cleanup
                     pass
 
+    def test_delete_record_json_output(
+        self, api, test_base_id: str | None, run_script
+    ) -> None:
+        """Test deleting a record with --json flag outputs valid JSON."""
+        if not test_base_id:
+            pytest.skip("AIRTABLE_TEST_BASE_ID not set, skipping integration test")
+
+        table_name = f"TestDeleteJson_{uuid.uuid4().hex[:8]}"
+        created_table_id = None
+
+        try:
+            base = api.base(test_base_id)
+            new_table = base.create_table(
+                name=table_name,
+                fields=[{"name": "Name", "type": "singleLineText"}],
+            )
+            created_table_id = new_table.id
+
+            # Create a record
+            create_result = run_script(
+                "records.py",
+                [
+                    "create",
+                    "--base-id",
+                    test_base_id,
+                    "--table",
+                    table_name,
+                    "--fields",
+                    json.dumps({"Name": "To Delete"}),
+                    "--json",
+                ],
+            )
+            assert create_result.returncode == 0, f"Create failed: {create_result.stderr}"
+            record_id = json.loads(create_result.stdout)["id"]
+
+            # Delete with --json
+            delete_result = run_script(
+                "records.py",
+                [
+                    "delete",
+                    "--base-id",
+                    test_base_id,
+                    "--table",
+                    table_name,
+                    "--record-id",
+                    record_id,
+                    "--json",
+                ],
+            )
+
+            assert delete_result.returncode == 0, f"Delete failed: {delete_result.stderr}"
+            data = json.loads(delete_result.stdout)
+            assert data["id"] == record_id
+            assert data["deleted"] is True
+
+        finally:
+            if created_table_id:
+                try:
+                    api.request(
+                        method="DELETE",
+                        url=f"https://api.airtable.com/v0/meta/bases/{test_base_id}/tables/{created_table_id}",
+                    )
+                except Exception:
+                    pass
+
+    def test_add_comment_json_output(
+        self, api, test_base_id: str | None, run_script
+    ) -> None:
+        """Test adding a comment with --json flag outputs valid JSON."""
+        if not test_base_id:
+            pytest.skip("AIRTABLE_TEST_BASE_ID not set, skipping integration test")
+
+        table_name = f"TestCommentJson_{uuid.uuid4().hex[:8]}"
+        created_table_id = None
+
+        try:
+            base = api.base(test_base_id)
+            new_table = base.create_table(
+                name=table_name,
+                fields=[{"name": "Name", "type": "singleLineText"}],
+            )
+            created_table_id = new_table.id
+
+            # Create a record to comment on
+            create_result = run_script(
+                "records.py",
+                [
+                    "create",
+                    "--base-id",
+                    test_base_id,
+                    "--table",
+                    table_name,
+                    "--fields",
+                    json.dumps({"Name": "Commentable"}),
+                    "--json",
+                ],
+            )
+            assert create_result.returncode == 0, f"Create failed: {create_result.stderr}"
+            record_id = json.loads(create_result.stdout)["id"]
+
+            # Add comment with --json
+            comment_result = run_script(
+                "records.py",
+                [
+                    "add-comment",
+                    "--base-id",
+                    test_base_id,
+                    "--table",
+                    table_name,
+                    "--record-id",
+                    record_id,
+                    "--text",
+                    "Test comment via JSON",
+                    "--json",
+                ],
+            )
+
+            assert comment_result.returncode == 0, f"Add comment failed: {comment_result.stderr}"
+            data = json.loads(comment_result.stdout)
+            assert "id" in data
+            assert data["text"] == "Test comment via JSON"
+
+        finally:
+            if created_table_id:
+                try:
+                    api.request(
+                        method="DELETE",
+                        url=f"https://api.airtable.com/v0/meta/bases/{test_base_id}/tables/{created_table_id}",
+                    )
+                except Exception:
+                    pass
+
+    def test_delete_comment_json_output(
+        self, api, test_base_id: str | None, run_script
+    ) -> None:
+        """Test deleting a comment with --json flag outputs valid JSON."""
+        if not test_base_id:
+            pytest.skip("AIRTABLE_TEST_BASE_ID not set, skipping integration test")
+
+        table_name = f"TestDelCommentJson_{uuid.uuid4().hex[:8]}"
+        created_table_id = None
+
+        try:
+            base = api.base(test_base_id)
+            new_table = base.create_table(
+                name=table_name,
+                fields=[{"name": "Name", "type": "singleLineText"}],
+            )
+            created_table_id = new_table.id
+
+            # Create a record
+            create_result = run_script(
+                "records.py",
+                [
+                    "create",
+                    "--base-id",
+                    test_base_id,
+                    "--table",
+                    table_name,
+                    "--fields",
+                    json.dumps({"Name": "Commentable"}),
+                    "--json",
+                ],
+            )
+            assert create_result.returncode == 0, f"Create failed: {create_result.stderr}"
+            record_id = json.loads(create_result.stdout)["id"]
+
+            # Add a comment first
+            add_result = run_script(
+                "records.py",
+                [
+                    "add-comment",
+                    "--base-id",
+                    test_base_id,
+                    "--table",
+                    table_name,
+                    "--record-id",
+                    record_id,
+                    "--text",
+                    "Comment to delete",
+                    "--json",
+                ],
+            )
+            assert add_result.returncode == 0, f"Add comment failed: {add_result.stderr}"
+            comment_id = json.loads(add_result.stdout)["id"]
+
+            # Delete comment with --json
+            delete_result = run_script(
+                "records.py",
+                [
+                    "delete-comment",
+                    "--base-id",
+                    test_base_id,
+                    "--table",
+                    table_name,
+                    "--record-id",
+                    record_id,
+                    "--comment-id",
+                    comment_id,
+                    "--json",
+                ],
+            )
+
+            assert delete_result.returncode == 0, f"Delete comment failed: {delete_result.stderr}"
+            data = json.loads(delete_result.stdout)
+            assert data["id"] == comment_id
+            assert data["deleted"] is True
+
+        finally:
+            if created_table_id:
+                try:
+                    api.request(
+                        method="DELETE",
+                        url=f"https://api.airtable.com/v0/meta/bases/{test_base_id}/tables/{created_table_id}",
+                    )
+                except Exception:
+                    pass
+
     def test_query_records_with_formula(
         self, api, test_base_id: str | None, run_script
     ) -> None:

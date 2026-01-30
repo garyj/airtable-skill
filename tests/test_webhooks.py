@@ -1107,6 +1107,70 @@ class TestWebhooksIntegration:
         webhook_ids_after = [w.id for w in webhooks_after]
         assert webhook_id not in webhook_ids_after, "Webhook should be deleted"
 
+    def test_delete_webhook_json_output(
+        self, run_script, has_token: bool, test_base_id: str | None
+    ) -> None:
+        """Test deleting a webhook with --json returns structured output."""
+        if not has_token:
+            pytest.skip("AIRTABLE_API_TOKEN not set")
+        if not test_base_id:
+            pytest.skip("AIRTABLE_TEST_BASE_ID not set")
+
+        spec = json.dumps({"options": {"filters": {"dataTypes": ["tableData"]}}})
+
+        # Create webhook
+        create_result = run_script(
+            "webhooks.py",
+            [
+                "create",
+                "--base-id",
+                test_base_id,
+                "--url",
+                "https://example.com/webhook",
+                "--spec",
+                spec,
+                "--json",
+            ],
+        )
+
+        assert create_result.returncode == 0, f"Create error: {create_result.stderr}"
+        create_data = json.loads(create_result.stdout)
+        webhook_id = create_data["id"]
+
+        try:
+            # Delete webhook with --json
+            delete_result = run_script(
+                "webhooks.py",
+                [
+                    "delete",
+                    "--base-id",
+                    test_base_id,
+                    "--webhook-id",
+                    webhook_id,
+                    "--json",
+                ],
+            )
+
+            assert (
+                delete_result.returncode == 0
+            ), f"Delete error: {delete_result.stderr}"
+            data = json.loads(delete_result.stdout)
+            assert data["id"] == webhook_id
+            assert data["deleted"] is True
+
+            # Verify webhook is actually deleted
+            from pyairtable import Api
+
+            api = Api(os.environ["AIRTABLE_API_TOKEN"])
+            base = api.base(test_base_id)
+            webhooks_after = base.webhooks()
+            webhook_ids_after = [w.id for w in webhooks_after]
+            assert webhook_id not in webhook_ids_after
+        except Exception:
+            # Clean up on failure
+            self._cleanup_webhook(test_base_id, webhook_id)
+            raise
+
     def test_get_webhook_payloads(
         self, run_script, has_token: bool, test_base_id: str | None
     ) -> None:
