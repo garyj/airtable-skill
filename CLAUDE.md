@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code skill for Airtable integration. It provides Python CLI scripts that Claude can use to interact with Airtable bases, tables, and records. The skill is located in `.claude/skills/airtable/`.
+This is a Claude Code plugin for Airtable integration. It provides Python CLI scripts that Claude can use to interact with Airtable bases, tables, and records. The plugin skill is located in `skills/airtable/`.
 
 ## Development Commands
 
@@ -19,8 +19,8 @@ uv run pytest tests/test_connection.py
 uv run pytest tests/test_connection.py::TestConnectionScript::test_missing_token_error
 
 # Run skill scripts (from project root)
-uv run .claude/skills/airtable/scripts/connection.py test
-uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table "TableName"
+uv run skills/airtable/scripts/connection.py test
+uv run skills/airtable/scripts/records.py list --base-id appXXX --table "TableName"
 ```
 
 ## Architecture
@@ -28,15 +28,19 @@ uv run .claude/skills/airtable/scripts/records.py list --base-id appXXX --table 
 ### Skill Structure
 
 ```
-.claude/skills/airtable/
-├── SKILL.md              # Skill definition and usage documentation
-├── privacy.md            # PII handling and security guidelines
-└── scripts/              # CLI scripts executed via `uv run`
-    ├── connection.py     # Test API connection, list bases
-    ├── records.py        # CRUD for individual records
-    ├── batch.py          # Bulk create/update/upsert/delete
-    ├── schema.py         # Table and field management
-    └── webhooks.py       # Webhook management
+.claude-plugin/
+└── plugin.json               # Plugin manifest
+commands/
+└── airtable.md               # /airtable command wrapper
+skills/airtable/
+├── SKILL.md                  # Skill definition and usage documentation
+├── privacy.md                # PII handling and security guidelines
+└── scripts/                  # CLI scripts executed via `uv run`
+    ├── connection.py         # Test API connection, list bases
+    ├── records.py            # CRUD for individual records
+    ├── batch.py              # Bulk create/update/upsert/delete
+    ├── schema.py             # Table and field management
+    └── webhooks.py           # Webhook management
 ```
 
 ### Script Pattern
@@ -61,6 +65,19 @@ Functions like `get_api_token()`, token-check boilerplate, and error sanitizatio
 
 - **pyairtable**: Python SDK for the Airtable API
 - **uv**: Package manager (scripts use PEP 723 inline dependencies)
+
+## Releasing
+
+Follow semver: major (breaking changes), minor (new features), patch (bug fixes).
+
+### Pre-Commit Checklist
+
+Before committing ANY changes to plugin code, skills, or scripts:
+
+- [ ] Version bumped in `.claude-plugin/plugin.json`
+- [ ] Version bumped in `.claude-plugin/marketplace.json` (must match)
+- [ ] Both versions are identical
+- [ ] Tests pass: `uv run pytest`
 
 ## Environment Variables
 
