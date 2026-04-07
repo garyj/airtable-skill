@@ -110,6 +110,10 @@ uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id a
 uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --sort "Name:desc"
 uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --sort "Status,Name:desc"
 
+# List records from a specific view (applies the view's filters, sorts, and field visibility)
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --view "Active Contacts"
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Contacts" --view "Active Contacts" --max-records 10
+
 # Get a specific record
 uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py get --base-id appXXX --table "Contacts" --record-id recXXX
 
@@ -120,6 +124,10 @@ uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id 
 # Query with match criteria (equality matching)
 uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
     --match '{"Status": "Active", "Company": "Acme Corp"}'
+
+# Query within a specific view
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Contacts" \
+    --formula "{Status}='Active'" --view "Active Contacts"
 
 # Create a record
 uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py create --base-id appXXX --table "Contacts" \

@@ -164,6 +164,7 @@ def list_records(
     max_records: int | None = None,
     fields: list[str] | None = None,
     sort: list[str] | None = None,
+    view: str | None = None,
 ) -> list[dict]:
     """List records from a table.
 
@@ -174,6 +175,7 @@ def list_records(
         max_records: Maximum number of records to return (optional).
         fields: List of field names to return (optional).
         sort: List of sort fields in pyairtable format (optional).
+        view: Name or ID of a view to filter records through (optional).
 
     Returns:
         List of dictionaries with record ID and field values.
@@ -189,6 +191,8 @@ def list_records(
         kwargs["fields"] = fields
     if sort is not None:
         kwargs["sort"] = sort
+    if view is not None:
+        kwargs["view"] = view
 
     results = table.all(**kwargs)
 
@@ -269,6 +273,7 @@ def query_records(
     table_name: str,
     formula: str | None = None,
     match_dict: dict | None = None,
+    view: str | None = None,
 ) -> list[dict]:
     """Query records using formula or match criteria.
 
@@ -278,6 +283,7 @@ def query_records(
         table_name: The name or ID of the table.
         formula: Airtable formula string (e.g., "{Field}='value'", "{Field}>5").
         match_dict: Dictionary for equality matching (uses pyairtable's match()).
+        view: Name or ID of a view to filter records through (optional).
 
     Returns:
         List of dictionaries with record ID and field values.
@@ -299,7 +305,12 @@ def query_records(
     else:
         query_formula = formula
 
-    results = table.all(formula=query_formula)
+    # Build kwargs for the all() call
+    kwargs = {"formula": query_formula}
+    if view is not None:
+        kwargs["view"] = view
+
+    results = table.all(**kwargs)
 
     return [
         {
@@ -508,6 +519,10 @@ def main() -> int:
         "Multiple fields: 'Name,Age:desc'",
     )
     list_parser.add_argument(
+        "--view",
+        help="Name or ID of a view to filter records through",
+    )
+    list_parser.add_argument(
         "--json", action="store_true", help="Output records as JSON array"
     )
 
@@ -555,6 +570,10 @@ def main() -> int:
     query_parser.add_argument(
         "--match",
         help='JSON object for equality matching (e.g., \'{"Name": "John", "Age": 21}\')',
+    )
+    query_parser.add_argument(
+        "--view",
+        help="Name or ID of a view to filter records through",
     )
     query_parser.add_argument(
         "--json", action="store_true", help="Output matching records as JSON array"
@@ -684,6 +703,7 @@ def main() -> int:
                 max_records=args.max_records,
                 fields=fields_list,
                 sort=sort_list,
+                view=args.view,
             )
 
             if args.json:
@@ -748,6 +768,7 @@ def main() -> int:
                 args.table,
                 formula=args.formula,
                 match_dict=match_dict,
+                view=args.view,
             )
 
             if args.json:

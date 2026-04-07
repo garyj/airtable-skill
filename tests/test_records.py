@@ -3274,3 +3274,98 @@ class TestDeleteCommentFunction:
         mock_comment2.delete.assert_called_once()
         mock_comment3.delete.assert_not_called()
         assert result == {"id": "comTARGET", "deleted": True}
+
+
+class TestListRecordsViewFilter:
+    """Tests for the --view parameter in list_records."""
+
+    def test_view_passed_to_api(self) -> None:
+        """Verify view kwarg is passed through to table.all()."""
+        from unittest.mock import MagicMock
+
+        from records import list_records
+
+        api = MagicMock()
+        mock_table = api.base.return_value.table.return_value
+        mock_table.all.return_value = []
+
+        list_records(api, "appXXX", "TestTable", view="My View")
+
+        mock_table.all.assert_called_once_with(view="My View")
+
+    def test_view_not_passed_when_none(self) -> None:
+        """Verify view kwarg is omitted when not provided."""
+        from unittest.mock import MagicMock
+
+        from records import list_records
+
+        api = MagicMock()
+        mock_table = api.base.return_value.table.return_value
+        mock_table.all.return_value = []
+
+        list_records(api, "appXXX", "TestTable")
+
+        mock_table.all.assert_called_once_with()
+
+    def test_view_combined_with_other_options(self) -> None:
+        """Verify view works alongside max_records, fields, and sort."""
+        from unittest.mock import MagicMock
+
+        from records import list_records
+
+        api = MagicMock()
+        mock_table = api.base.return_value.table.return_value
+        mock_table.all.return_value = []
+
+        list_records(
+            api,
+            "appXXX",
+            "TestTable",
+            max_records=10,
+            fields=["Name", "Email"],
+            sort=["Name"],
+            view="Grid view",
+        )
+
+        mock_table.all.assert_called_once_with(
+            max_records=10,
+            fields=["Name", "Email"],
+            sort=["Name"],
+            view="Grid view",
+        )
+
+
+class TestQueryRecordsViewFilter:
+    """Tests for the --view parameter in query_records."""
+
+    def test_view_passed_to_api_with_formula(self) -> None:
+        """Verify view kwarg is passed through to table.all() with formula."""
+        from unittest.mock import MagicMock
+
+        from records import query_records
+
+        api = MagicMock()
+        mock_table = api.base.return_value.table.return_value
+        mock_table.all.return_value = []
+
+        query_records(
+            api, "appXXX", "TestTable", formula="{Status}='Active'", view="My View"
+        )
+
+        mock_table.all.assert_called_once_with(
+            formula="{Status}='Active'", view="My View"
+        )
+
+    def test_view_not_passed_when_none(self) -> None:
+        """Verify view kwarg is omitted when not provided."""
+        from unittest.mock import MagicMock
+
+        from records import query_records
+
+        api = MagicMock()
+        mock_table = api.base.return_value.table.return_value
+        mock_table.all.return_value = []
+
+        query_records(api, "appXXX", "TestTable", formula="{Status}='Active'")
+
+        mock_table.all.assert_called_once_with(formula="{Status}='Active'")
