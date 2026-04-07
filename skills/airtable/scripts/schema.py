@@ -8,7 +8,7 @@
 """
 Airtable schema management script.
 
-List tables in a base, view detailed field information, create new tables, delete tables, add fields, and update fields.
+List tables in a base, view detailed field information, create new tables, delete tables, add fields, update fields, and list views.
 
 Usage:
     uv run schema.py tables list --base-id <id>
@@ -22,6 +22,8 @@ Usage:
     uv run schema.py fields create --base-id <id> --table <name> --field <json> --json
     uv run schema.py fields update --base-id <id> --table <name> --field-id <id> --name <new-name>
     uv run schema.py fields update --base-id <id> --table <name> --field-id <id> --description <desc>
+    uv run schema.py views list --base-id <id> --table <name>
+    uv run schema.py views list --base-id <id> --table <name> --json
 """
 
 import argparse
@@ -601,6 +603,48 @@ def format_fields_table(table_info: dict) -> str:
     return "\n".join(lines)
 
 
+def list_views(api: Api, base_id: str, table_name: str) -> list[dict]:
+    """List all views on a table."""
+    base = api.base(base_id)
+    table = base.table(table_name)
+    table_schema = table.schema()
+
+    views = []
+    for view in table_schema.views:
+        views.append({
+            "id": view.id,
+            "name": view.name,
+            "type": view.type,
+        })
+
+    return views
+
+
+def format_views_table(views: list[dict]) -> str:
+    """Format views list as a table with columns: View ID, View Name, Type."""
+    if not views:
+        return "No views found."
+
+    # Calculate column widths
+    id_width = max(len("View ID"), max(len(v["id"]) for v in views))
+    name_width = max(len("View Name"), max(len(v["name"]) for v in views))
+    type_width = max(len("Type"), max(len(v["type"]) for v in views))
+
+    # Build table
+    lines = []
+    header = f"{'View ID':<{id_width}}  {'View Name':<{name_width}}  {'Type':<{type_width}}"
+    separator = f"{'-' * id_width}  {'-' * name_width}  {'-' * type_width}"
+    lines.append(header)
+    lines.append(separator)
+
+    for view in views:
+        lines.append(
+            f"{view['id']:<{id_width}}  {view['name']:<{name_width}}  {view['type']:<{type_width}}"
+        )
+
+    return "\n".join(lines)
+
+
 def main() -> int:
     """Main entry point."""
     parser = argparse.ArgumentParser(
@@ -731,6 +775,22 @@ def main() -> int:
         "--json", action="store_true", help="Output as JSON"
     )
 
+    # views subcommand group
+    views_parser = subparsers.add_parser("views", help="View operations")
+    views_subparsers = views_parser.add_subparsers(dest="views_command", required=True)
+
+    # views list subcommand
+    views_list_parser = views_subparsers.add_parser("list", help="List all views on a table")
+    views_list_parser.add_argument(
+        "--base-id", required=True, help="The Airtable base ID"
+    )
+    views_list_parser.add_argument(
+        "--table", required=True, help="The table name or ID"
+    )
+    views_list_parser.add_argument(
+        "--json", action="store_true", help="Output as JSON"
+    )
+
     args = parser.parse_args()
 
     # Check for API token
@@ -830,6 +890,19 @@ def main() -> int:
                 return 1
             except Exception as e:
                 print(f"Error updating field: {e}", file=sys.stderr)
+                return 1
+
+    elif args.command == "views":
+        if args.views_command == "list":
+            try:
+                views = list_views(api, args.base_id, args.table)
+                if args.json:
+                    print(json.dumps(views, indent=2))
+                else:
+                    print(format_views_table(views))
+                return 0
+            except Exception as e:
+                print(f"Error listing views: {e}", file=sys.stderr)
                 return 1
 
     return 0

@@ -93,6 +93,14 @@ uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables describe -
 
 **Supported field types:** singleLineText, multilineText, number, email, url, phoneNumber, singleSelect, multipleSelects, checkbox, date, dateTime, currency, percent, duration, rating, richText, multipleRecordLinks, multipleAttachments, multipleLookupValues, rollup
 
+```bash
+# List all views on a table
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py views list --base-id appXXX --table "Contacts"
+
+# List views with JSON output
+uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py views list --base-id appXXX --table "Contacts" --json
+```
+
 ### records.py - Record CRUD & Comments
 
 Create, read, update, delete, and query records.
@@ -343,7 +351,7 @@ All scripts support `--json` for machine-readable output:
 | Script | Commands with --json |
 |--------|---------------------|
 | connection.py | `bases --json` |
-| schema.py | `tables list --json`, `tables describe --json`, `tables create --json`, `fields create --json` |
+| schema.py | `tables list --json`, `tables describe --json`, `tables create --json`, `fields create --json`, `views list --json` |
 | records.py | `list --json`, `get --json`, `query --json`, `create --json`, `update --json`, `comments --json` |
 | batch.py | `create --json`, `update --json`, `upsert --json`, `delete --json` |
 | webhooks.py | `list --json`, `get --json`, `create --json`, `payloads --json` |
@@ -391,6 +399,7 @@ Scripts provide clear error messages without exposing sensitive data:
 | List bases | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/connection.py bases` |
 | List tables | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables list --base-id appXXX` |
 | Describe table | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py tables describe --base-id appXXX --table "Name"` |
+| List views | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/schema.py views list --base-id appXXX --table "Name"` |
 | List records | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py list --base-id appXXX --table "Name"` |
 | Query records | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py query --base-id appXXX --table "Name" --formula "..."` |
 | Create record | `uv run ${CLAUDE_PLUGIN_ROOT}/skills/airtable/scripts/records.py create --base-id appXXX --table "Name" --fields '{...}'` |

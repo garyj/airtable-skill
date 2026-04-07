@@ -2690,3 +2690,131 @@ class TestRollupFieldIntegration:
                         )
                     except Exception:
                         pass
+
+class TestViewsListCommand:
+    """Tests for the views list subcommand."""
+
+    def test_requires_base_id_and_table(self, run_script) -> None:
+        """Verify --base-id and --table are required for views list."""
+        result = run_script("schema.py", ["views", "list"])
+
+        assert result.returncode != 0
+        assert "--base-id" in result.stderr or "--table" in result.stderr
+
+    def test_missing_token_error(self, run_script, env_without_token) -> None:
+        """Verify error message when AIRTABLE_API_TOKEN is missing."""
+        result = run_script(
+            "schema.py",
+            ["views", "list", "--base-id", "appXXXXX", "--table", "SomeTable"],
+            env=env_without_token,
+        )
+
+        assert result.returncode == 1
+        assert "AIRTABLE_API_TOKEN" in result.stderr
+
+
+class TestViewsListFunctions:
+    """Unit tests for views list functions."""
+
+    def test_format_views_table_empty(self, scripts_dir) -> None:
+        """Test view formatting with empty list."""
+        import sys
+        sys.path.insert(0, str(scripts_dir))
+        from schema import format_views_table
+
+        result = format_views_table([])
+        assert result == "No views found."
+
+    def test_format_views_table_with_data(self, scripts_dir) -> None:
+        """Test view formatting with data."""
+        import sys
+        sys.path.insert(0, str(scripts_dir))
+        from schema import format_views_table
+
+        views = [
+            {"id": "viwABC123", "name": "Grid view", "type": "grid"},
+            {"id": "viwDEF456", "name": "Kanban board", "type": "kanban"},
+        ]
+        result = format_views_table(views)
+
+        assert "View ID" in result
+        assert "View Name" in result
+        assert "Type" in result
+        assert "viwABC123" in result
+        assert "Grid view" in result
+        assert "grid" in result
+        assert "viwDEF456" in result
+        assert "Kanban board" in result
+        assert "kanban" in result
+
+    def test_list_views_returns_view_data(self, scripts_dir) -> None:
+        """Test list_views extracts id, name, type from schema views."""
+        import sys
+        from unittest.mock import MagicMock
+
+        sys.path.insert(0, str(scripts_dir))
+        from schema import list_views
+
+        mock_api = MagicMock()
+        mock_view1 = MagicMock()
+        mock_view1.id = "viwABC123"
+        mock_view1.name = "Grid view"
+        mock_view1.type = "grid"
+        mock_view2 = MagicMock()
+        mock_view2.id = "viwDEF456"
+        mock_view2.name = "Gallery"
+        mock_view2.type = "gallery"
+
+        mock_table_schema = MagicMock()
+        mock_table_schema.views = [mock_view1, mock_view2]
+        mock_api.base.return_value.table.return_value.schema.return_value = mock_table_schema
+
+        result = list_views(mock_api, "appTEST", "TestTable")
+
+        assert len(result) == 2
+        assert result[0] == {"id": "viwABC123", "name": "Grid view", "type": "grid"}
+        assert result[1] == {"id": "viwDEF456", "name": "Gallery", "type": "gallery"}
+
+
+class TestViewsListIntegration:
+    """Integration tests for views list with real Airtable."""
+
+    @pytest.fixture
+    def has_token(self) -> bool:
+        return bool(os.environ.get("AIRTABLE_API_TOKEN"))
+
+    @pytest.fixture
+    def test_base_id(self) -> str | None:
+        return os.environ.get("AIRTABLE_TEST_BASE_ID")
+
+    def test_views_list_with_real_token(self, run_script, has_token: bool, test_base_id: str | None) -> None:
+        """Test views listing with real token."""
+        if not has_token:
+            pytest.skip("AIRTABLE_API_TOKEN not set, skipping integration test")
+        if not test_base_id:
+            pytest.skip("AIRTABLE_TEST_BASE_ID not set, skipping integration test")
+
+        result = run_script("schema.py", ["views", "list", "--base-id", test_base_id, "--table", "Table 1"])
+
+        assert result.returncode == 0
+        assert "View ID" in result.stdout or "No views found" in result.stdout
+
+    def test_views_list_json_with_real_token(self, run_script, has_token: bool, test_base_id: str | None) -> None:
+        """Test views listing with JSON output."""
+        if not has_token:
+            pytest.skip("AIRTABLE_API_TOKEN not set, skipping integration test")
+        if not test_base_id:
+            pytest.skip("AIRTABLE_TEST_BASE_ID not set, skipping integration test")
+
+        result = run_script(
+            "schema.py",
+            ["views", "list", "--base-id", test_base_id, "--table", "Table 1", "--json"],
+        )
+
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert isinstance(data, list)
+        for item in data:
+            assert "id" in item
+            assert "name" in item
+            assert "type" in item
